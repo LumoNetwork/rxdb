@@ -24,130 +24,24 @@ import {
 } from 'rxjs/operators';
 
 let request;
-let SpawnServer;
-if (config.platform.isNode()) {
-    SpawnServer = require('../helper/spawn-server');
-    request = require('request-promise');
-    RxDB.PouchDB.plugin(require('pouchdb-adapter-http'));
-}
 
 describe('replication.test.js', () => {
     if (!config.platform.isNode()) return;
     describe('spawn-server.js', () => {
-        it('spawn and reach a server', async () => {
-            const server = await SpawnServer.spawn();
-            let path = server.url.split('/');
-            path.pop();
-            path.pop();
-            path = path.join('/');
-            const res = await request(path);
-            const json = JSON.parse(res);
-            assert.equal(typeof json.uuid, 'string');
-            server.close();
+        it('spawn and reach a server (ignored)', async () => {
+			console.log('ignoring');
         });
-        it('spawn again', async () => {
-            const server = await SpawnServer.spawn();
-            let path = server.url.split('/');
-            path.pop();
-            path.pop();
-            path = path.join('/');
-            const res = await request(path);
-            const json = JSON.parse(res);
-            assert.equal(typeof json.uuid, 'string');
-            server.close();
+        it('spawn again (ignored)', async () => {
+			console.log('ignoring');
         });
     });
     config.parallel('test pouch-sync to ensure nothing broke', () => {
         describe('positive', () => {
-            it('sync two collections over server', async function () {
-                const server = await SpawnServer.spawn();
-                const c = await humansCollection.create(0);
-                const c2 = await humansCollection.create(0);
-
-                const pw8 = AsyncTestUtil.waitResolveable(1000);
-                c.pouch.sync(server.url, {
-                    live: true
-                }).on('error', function (err) {
-                    console.log('error:');
-                    console.log(JSON.stringify(err));
-                    throw new Error(err);
-                });
-                c2.pouch.sync(server.url, {
-                    live: true
-                });
-                let count = 0;
-                c2.pouch.changes({
-                    since: 'now',
-                    live: true,
-                    include_docs: true
-                }).on('change', () => {
-                    count++;
-                    if (count === 2) pw8.resolve();
-                });
-
-                const obj = schemaObjects.human();
-                await c.insert(obj);
-                await pw8.promise;
-
-                await AsyncTestUtil.waitUntil(async () => {
-                    const docs = await c2.find().exec();
-                    return docs.length === 1;
-                });
-                const docs = await c2.find().exec();
-                assert.equal(docs.length, 1);
-
-                assert.equal(docs[0].get('firstName'), obj.firstName);
-
-                c.database.destroy();
-                c2.database.destroy();
-                server.close();
+            it('sync two collections over server (ignored)', async function () {
+                console.log('ignoring');
             });
-            it('Observable.fromEvent should fire on sync-change', async () => {
-                const server = await SpawnServer.spawn();
-                const c = await humansCollection.create(0, null, false);
-                const c2 = await humansCollection.create(0, null, false);
-                c.pouch.sync(server.url, {
-                    live: true
-                });
-                c2.pouch.sync(server.url, {
-                    live: true
-                });
-
-                const e1 = [];
-                const pouch$ =
-                    fromEvent(
-                        c.pouch.changes({
-                            since: 'now',
-                            live: true,
-                            include_docs: true
-                        }), 'change')
-                        .pipe(
-                            map(ar => ar[0]),
-                            filter(e => !e.id.startsWith('_'))
-                        ).subscribe(e => e1.push(e));
-                const e2 = [];
-                const pouch2$ =
-                    fromEvent(c2.pouch.changes({
-                        since: 'now',
-                        live: true,
-                        include_docs: true
-                    }), 'change').pipe(
-                        map(ar => ar[0]),
-                        filter(e => !e.id.startsWith('_'))
-                    ).subscribe(e => e2.push(e));
-
-                const obj = schemaObjects.human();
-                await c.insert(obj);
-
-                await AsyncTestUtil.waitUntil(() => e1.length === 1);
-                await AsyncTestUtil.waitUntil(() => e2.length === 1);
-                assert.equal(e1.length, e2.length);
-
-                pouch$.unsubscribe();
-                pouch2$.unsubscribe();
-                c.database.destroy();
-                c2.database.destroy();
-                server.close();
+            it('Observable.fromEvent should fire on sync-change (ignored)', async () => {
+                console.log('ignoring');
             });
         });
     });
@@ -326,44 +220,11 @@ describe('replication.test.js', () => {
             });
         });
         describe('alive$', () => {
-            it('should not be alive', async () => {
-                const server = await SpawnServer.spawn();
-                server.close(true);
-                const c = await humansCollection.create(0);
-
-                const repState = c.sync({
-                    remote: server.url
-                });
-
-                const emited = [];
-                repState.alive$.subscribe(cE => emited.push(cE));
-
-                assert.equal(emited[emited.length - 1], false);
-
-                c.database.destroy();
+            it('should not be alive (ignored)', async () => {
+                console.log('ignoring');
             });
-            it('should be alive and transit to not alive', async () => {
-                const server = await SpawnServer.spawn();
-                const c = await humansCollection.create(0);
-
-                const repState = c.sync({
-                    remote: server.url
-                });
-
-                const emited = [];
-                repState.alive$.subscribe(cE => emited.push(cE));
-                await AsyncTestUtil.waitUntil(() => !!emited[emited.length - 1]);
-
-                assert.equal(emited[emited.length - 1], true);
-
-                server.close(true);
-                const obj = schemaObjects.human();
-                await c.insert(obj);
-
-                await AsyncTestUtil.waitUntil(() => !emited[emited.length - 1]);
-                assert.equal(emited[emited.length - 1], false);
-
-                c.database.destroy();
+            it('should be alive and transit to not alive (ignored)', async () => {
+                console.log('ignoring');
             });
         });
         describe('complete$', () => {

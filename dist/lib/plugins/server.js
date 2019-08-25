@@ -11,8 +11,6 @@ exports["default"] = exports.overwritable = exports.hooks = exports.prototypes =
 
 var _express = _interopRequireDefault(require("express"));
 
-var _expressPouchdb = _interopRequireDefault(require("express-pouchdb"));
-
 var _cors = _interopRequireDefault(require("cors"));
 
 var _pouchDb = _interopRequireDefault(require("../pouch-db"));
@@ -25,6 +23,7 @@ var _replication = _interopRequireDefault(require("./replication"));
 
 var _watchForChanges = _interopRequireDefault(require("./watch-for-changes"));
 
+// DISABLED PLUGIN
 _core["default"].plugin(_replication["default"]);
 
 _core["default"].plugin(_watchForChanges["default"]); // we have to clean up after tests so there is no stupid logging
@@ -106,7 +105,6 @@ function spawnServer(_ref) {
     });
   }
 
-  app.use(path, (0, _expressPouchdb["default"])(pseudo));
   var server = app.listen(port);
   SERVERS_OF_DB.get(db).push(server);
   return {

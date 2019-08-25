@@ -1,5 +1,5 @@
+// DISABLED PLUGIN
 import express from 'express';
-import ExpressPouchDB from 'express-pouchdb';
 import corsFn from 'cors';
 
 import PouchDB from '../pouch-db';
@@ -81,8 +81,6 @@ export function spawnServer({
         .map(method => method.toLowerCase())
             .forEach(method => app[method]('*', corsFn()));
     }
-
-    app.use(path, ExpressPouchDB(pseudo));
 
     const server = app.listen(port);
     SERVERS_OF_DB.get(db).push(server);
